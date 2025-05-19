@@ -197,7 +197,7 @@ class _InterfazAdminState extends State<InterfazAdmin> {
             Container(
               height: 200,
               color: Colors.grey[200],
-              child: Center(child: Text('Aquí irá la tabla/lista del historial')),
+              child: Center(child: Text('')),
             ),
             Divider(height: 40),
             Text('Habitaciones y Usuarios Asignados', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),

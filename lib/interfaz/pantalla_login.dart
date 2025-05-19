@@ -20,7 +20,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
       final String usuario = _usuarioCtrl.text.trim();
       final String contrasena = _passCtrl.text.trim();
 
-      // Acceso fijo para el admin
+      // Acceso fijo para el admin pueba
       if (usuario == 'admin' && contrasena == '1234') {
         Navigator.pushReplacement(
           context,
@@ -36,7 +36,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
       }
 
       // Validación real para usuarios comunes
-      final url = Uri.parse('http://192.168.18.42:5000/login'); // ← Reemplaza TU_IP_LOCAL por tu IP real
+      final url = Uri.parse('http://192.168.18.42:5000/login'); //ip real
 
       try {
         final response = await http.post(
