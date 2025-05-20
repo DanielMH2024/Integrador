@@ -37,7 +37,7 @@ class _PantallaLoginState extends State<PantallaLogin> {
 
       // Validación real para usuarios comunes
       final url = Uri.parse('http://192.168.18.42:5000/login'); //ip real
-
+      //estaba por defecto la ip
       try {
         final response = await http.post(
           url,
@@ -109,6 +109,12 @@ class _PantallaLoginState extends State<PantallaLogin> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
+                Image.asset(
+                  'assets/usuario.png',
+                  height: 150,
+                ),
+                SizedBox(height: 24),
                 TextFormField(
                   controller: _usuarioCtrl,
                   decoration: InputDecoration(

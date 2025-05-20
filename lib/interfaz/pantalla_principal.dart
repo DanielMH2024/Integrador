@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pantalla_login.dart'; // Asegúrate de importar tu login aquí
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class InterfazPrincipal extends StatelessWidget {
   final int idUsuario;
   final String nombre;
@@ -84,7 +84,7 @@ class InterfazPrincipal extends StatelessWidget {
                 Column(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.toys, size: 30),
+                      icon: Icon(Icons.ac_unit, size: 30),
                       onPressed: () => _navegarADispositivo(context, 'ventilador'),
                     ),
                     Text('Ventilador'),
