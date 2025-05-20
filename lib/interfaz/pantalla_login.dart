@@ -36,8 +36,8 @@ class _PantallaLoginState extends State<PantallaLogin> {
       }
 
       // Validación real para usuarios comunes
-      final url = Uri.parse('http://192.168.18.42:5000/login'); //ip real
-      //estaba por defecto la ip
+      final url = Uri.parse('http://localhost:5000/login'); //ip real
+      // la ip 192.168.18.42 para que se comunique con telefono
       try {
         final response = await http.post(
           url,

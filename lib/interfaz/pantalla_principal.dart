@@ -46,6 +46,7 @@ class InterfazPrincipal extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
             Text(
               'Bienvenido, $nombre',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
