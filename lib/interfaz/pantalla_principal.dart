@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:integrador_app/interfaz/pantalla_soporte.dart';
 import 'pantalla_login.dart'; // Asegúrate de importar tu login aquí
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 class InterfazPrincipal extends StatelessWidget {
@@ -109,10 +110,31 @@ class InterfazPrincipal extends StatelessWidget {
                     Text('Luz'),
                   ],
                 ),
+
               ],
-            )
+            ),
+            SizedBox(height: 30),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => PantallaSoporte()), // A crear
+                  );
+                },
+                icon: Icon(Icons.support_agent),
+                label: Text('Soporte Técnico'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
           ],
         ),
+
       ),
     );
   }

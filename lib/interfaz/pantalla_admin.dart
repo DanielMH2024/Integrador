@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:integrador_app/interfaz/pantalla_administrar_usuarios.dart';
 import 'pantalla_login.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -203,6 +204,28 @@ class _InterfazAdminState extends State<InterfazAdmin> {
             Text('Habitaciones y Usuarios Asignados', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
 
+            //boton para administrar usuarios
+            ElevatedButton.icon(
+              onPressed: () {
+                _cargarDatos();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PantallaAdministrarUsuarios(),
+                  ),
+                );
+
+              },
+
+              icon: Icon(Icons.manage_accounts),
+              label: Text('Administrar Usuarios'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            SizedBox(height: 20),
+
             //Apartado para mostrar la lista historial
             Container(
               height: 200,
@@ -236,7 +259,7 @@ class _InterfazAdminState extends State<InterfazAdmin> {
 
 }
 
-// Función para crear usuario desde el backend
+// creacion de usuario
 Future<Map<String, dynamic>> crearUsuario(Map<String, String> datos) async {
   final url = Uri.parse('http://localhost:5000/registro');
 
@@ -269,6 +292,7 @@ Future<Map<String, dynamic>> crearUsuario(Map<String, String> datos) async {
 }
 
 
+
 // Funcion para la lista de usuarios y habitaciones
 Future<List<dynamic>> fetchHabitacionesUsuarios() async {
   final url = Uri.parse('http://localhost:5000/habitaciones_usuarios'); // Cambia por tu endpoint real
@@ -285,4 +309,6 @@ Future<List<dynamic>> fetchHabitacionesUsuarios() async {
     throw Exception('Error de conexión: $e');
   }
 }
+
+
 
