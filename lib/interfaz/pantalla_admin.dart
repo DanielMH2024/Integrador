@@ -1,8 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:integrador_app/interfaz/pantalla_administrar_mensajes.dart';
 import 'package:integrador_app/interfaz/pantalla_administrar_usuarios.dart';
 import 'pantalla_login.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'package:http_parser/http_parser.dart';
+
 
 class InterfazAdmin extends StatefulWidget {
   final int idUsuario;
@@ -20,10 +25,13 @@ class InterfazAdmin extends StatefulWidget {
 }
 
 class _InterfazAdminState extends State<InterfazAdmin> {
-
   List<dynamic> habitacionesUsuarios = [];
   bool cargando = false;
   String errorCarga = '';
+
+  List<dynamic> mensajesAtencion = []; // Declarar esta lista aquí
+  bool cargandoMensajes = false;
+  String errorMensajes = '';
 
   // Controladores de texto
   final TextEditingController _nombreCtrl = TextEditingController();
@@ -36,16 +44,40 @@ class _InterfazAdminState extends State<InterfazAdmin> {
   final TextEditingController _passCtrl = TextEditingController();
   final TextEditingController _habitacionCtrl = TextEditingController();
 
-
-
   String rolSeleccionado = 'usuario';
   final List<String> roles = ['usuario', 'admin'];
 
-  //aqui metodo para lista
   @override
   void initState() {
     super.initState();
     _cargarDatos();
+    _cargarMensajes();
+  }
+
+  //nuevo a gregado
+  void _cargarMensajes() async {
+    setState(() {
+      cargandoMensajes = true;
+      errorMensajes = '';
+    });
+
+    try {
+      final mensajes = await fetchMensajesProblemas();
+      print('Mensajes recibidos: $mensajes'); // <- Aquí
+      setState(() {
+        mensajesAtencion = List.from(mensajes);
+        mensajesAtencion.sort((a, b) =>
+            (a['fecha'] ?? '').compareTo(b['fecha'] ?? ''));
+      });
+    } catch (e) {
+      setState(() {
+        errorMensajes = e.toString();
+      });
+    } finally {
+      setState(() {
+        cargandoMensajes = false;
+      });
+    }
   }
 
   void _cargarDatos() async {
@@ -117,22 +149,28 @@ class _InterfazAdminState extends State<InterfazAdmin> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Crear Nueva Cuenta', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Crear Nueva Cuenta',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             _buildTextField(_nombreCtrl, 'Nombre', Icons.person),
             _buildTextField(_apellidoCtrl, 'Apellido', Icons.person_outline),
             _buildTextField(_dniCtrl, 'DNI', Icons.badge, TextInputType.number),
-            _buildTextField(_telefonoCtrl, 'Teléfono', Icons.phone, TextInputType.phone),
+            _buildTextField(_telefonoCtrl, 'Teléfono', Icons.phone,
+                TextInputType.phone),
             _buildTextField(_direccionCtrl, 'Dirección', Icons.home),
-            _buildTextField(_correoCtrl, 'Correo electrónico', Icons.email, TextInputType.emailAddress),
+            _buildTextField(_correoCtrl, 'Correo electrónico', Icons.email,
+                TextInputType.emailAddress),
             _buildTextField(_usuarioCtrl, 'Usuario', Icons.account_circle),
             _buildTextField(_passCtrl, 'Contraseña', Icons.lock, null, true),
-            _buildTextField(_habitacionCtrl, 'Habitación asignada', Icons.meeting_room),
+            _buildTextField(
+                _habitacionCtrl, 'Habitación asignada', Icons.meeting_room),
             SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: rolSeleccionado,
-              decoration: InputDecoration(labelText: 'Rol', border: OutlineInputBorder()),
-              items: roles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+              decoration: InputDecoration(
+                  labelText: 'Rol', border: OutlineInputBorder()),
+              items:
+              roles.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
               onChanged: (value) {
                 setState(() {
                   rolSeleccionado = value ?? 'usuario';
@@ -142,9 +180,15 @@ class _InterfazAdminState extends State<InterfazAdmin> {
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () async {
-                if (_nombreCtrl.text.isEmpty || _apellidoCtrl.text.isEmpty || _dniCtrl.text.isEmpty ||
-                    _telefonoCtrl.text.isEmpty || _direccionCtrl.text.isEmpty || _correoCtrl.text.isEmpty ||
-                    _usuarioCtrl.text.isEmpty || _passCtrl.text.isEmpty || _habitacionCtrl.text.isEmpty) {
+                if (_nombreCtrl.text.isEmpty ||
+                    _apellidoCtrl.text.isEmpty ||
+                    _dniCtrl.text.isEmpty ||
+                    _telefonoCtrl.text.isEmpty ||
+                    _direccionCtrl.text.isEmpty ||
+                    _correoCtrl.text.isEmpty ||
+                    _usuarioCtrl.text.isEmpty ||
+                    _passCtrl.text.isEmpty ||
+                    _habitacionCtrl.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Rellene todos los campos')),
                   );
@@ -193,18 +237,19 @@ class _InterfazAdminState extends State<InterfazAdmin> {
               ),
             ),
             Divider(height: 40),
-            Text('Historial de Comandos', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Historial de Comandos',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
             Container(
               height: 200,
               color: Colors.grey[200],
-              child: Center(child: Text('')),
+              child: Center(child: Text('')), // Aquí deberías poner el historial
             ),
             Divider(height: 40),
-            Text('Habitaciones y Usuarios Asignados', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('Habitaciones y Usuarios Asignados',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
 
-            //boton para administrar usuarios
             ElevatedButton.icon(
               onPressed: () {
                 _cargarDatos();
@@ -214,9 +259,7 @@ class _InterfazAdminState extends State<InterfazAdmin> {
                     builder: (_) => PantallaAdministrarUsuarios(),
                   ),
                 );
-
               },
-
               icon: Icon(Icons.manage_accounts),
               label: Text('Administrar Usuarios'),
               style: ElevatedButton.styleFrom(
@@ -226,7 +269,6 @@ class _InterfazAdminState extends State<InterfazAdmin> {
             ),
             SizedBox(height: 20),
 
-            //Apartado para mostrar la lista historial
             Container(
               height: 200,
               color: Colors.grey[200],
@@ -238,13 +280,75 @@ class _InterfazAdminState extends State<InterfazAdmin> {
                 itemCount: habitacionesUsuarios.length,
                 itemBuilder: (context, index) {
                   final item = habitacionesUsuarios[index];
-                  // Ajusta los campos según tu JSON
                   return ListTile(
                     title: Text('${item['nombre']} ${item['apellido']}'),
                     subtitle: Text(
-                        'Usuario: ${item['nombre_usuario']}\n'
-                            'Contraseña: ${item['contrasena_usuario']}\n'
-                            'Habitación: ${item['habitacion']}',
+                      'Usuario: ${item['nombre_usuario']}\n'
+                          'Contraseña: ${item['contrasena_usuario']}\n'
+                          'Habitación: ${item['habitacion']}',
+                    ),
+                    isThreeLine: true,
+                  );
+                },
+              ),
+            ),
+
+            Divider(height: 40),
+            Text('Mensajes de Atención',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            SizedBox(height: 10),
+
+            ElevatedButton.icon(
+              onPressed: () async {
+                final resultado = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => PantallaAdministrarMensajes()),
+                );
+
+                if (resultado == true) {
+                  _cargarMensajes();
+                }
+              },
+              icon: Icon(Icons.message),
+              label: Text('Administrar Mensajes'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+            ),
+
+            SizedBox(height: 20),
+
+            Container(
+              height: 200,
+              color: Colors.grey[200],
+              child: cargandoMensajes
+                  ? Center(child: CircularProgressIndicator())
+                  : errorMensajes.isNotEmpty
+                  ? Center(child: Text('Error: $errorMensajes'))
+                  : mensajesAtencion.isEmpty
+                  ? Center(child: Text('No hay mensajes'))
+                  : ListView.builder(
+                itemCount: mensajesAtencion.length,
+                itemBuilder: (context, index) {
+                  final msg = mensajesAtencion[index];
+
+                  final habitacion = msg['habitacion'] ?? 'Desconocida';
+                  final nombreCompleto = msg['nombre_persona'] ?? 'Desconocido';
+                  final tipoProblema = msg['tipo_problema'] ?? 'Sin tipo';
+                  final mensaje = msg['mensaje'] ?? 'Sin mensaje';
+                  final fecha = msg['fecha'] ?? '';
+                  final fechaFormateada = fecha.isNotEmpty
+                      ? formatearFecha(fecha)
+                      : 'sin fecha';
+
+                  return ListTile(
+                    title: Text(nombreCompleto),
+                    subtitle: Text(
+                      'Habitación: $habitacion\n'
+                          'Tipo: $tipoProblema\n'
+                          'Mensaje: $mensaje\n'
+                          'Fecha: $fechaFormateada',
                     ),
                     isThreeLine: true,
                   );
@@ -256,7 +360,6 @@ class _InterfazAdminState extends State<InterfazAdmin> {
       ),
     );
   }
-
 }
 
 // creacion de usuario
@@ -291,8 +394,6 @@ Future<Map<String, dynamic>> crearUsuario(Map<String, String> datos) async {
   }
 }
 
-
-
 // Funcion para la lista de usuarios y habitaciones
 Future<List<dynamic>> fetchHabitacionesUsuarios() async {
   final url = Uri.parse('http://localhost:5000/habitaciones_usuarios'); // Cambia por tu endpoint real
@@ -303,12 +404,37 @@ Future<List<dynamic>> fetchHabitacionesUsuarios() async {
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
-      throw Exception('Error al cargar datos');
+      throw Exception('Error al cargar datos: ${response.statusCode}');
     }
   } catch (e) {
     throw Exception('Error de conexión: $e');
   }
 }
 
+// Función para traer mensajes de problemas o atención
+Future<List<dynamic>> fetchMensajesProblemas() async {
+  final url = Uri.parse('http://localhost:5000/soporte'); // Cambia por tu endpoint real
 
+  try {
+    final response = await http.get(url);
 
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Error al cargar mensajes');
+    }
+  } catch (e) {
+    throw Exception('Error de conexión: $e');
+  }
+}
+
+//cambio de fecha
+String formatearFecha(String fechaOriginal) {
+  try {
+    DateTime fechaParseada = HttpDate.parse(fechaOriginal);
+    final formatoDeseado = DateFormat('dd/MM/yyyy HH:mm');
+    return formatoDeseado.format(fechaParseada);
+  } catch (e) {
+    return fechaOriginal;
+  }
+}

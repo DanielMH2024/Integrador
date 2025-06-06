@@ -119,7 +119,7 @@ class InterfazPrincipal extends StatelessWidget {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => PantallaSoporte()), // A crear
+                    MaterialPageRoute(builder: (_) => PantallaSoporte(idUsuario: idUsuario)), // A crear
                   );
                 },
                 icon: Icon(Icons.support_agent),
