@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:integrador_app/interfaz/pantalla_soporte.dart';
-import 'pantalla_login.dart'; // Asegúrate de importar tu login aquí
+import 'pantalla_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 class InterfazPrincipal extends StatelessWidget {
   final int idUsuario;
   final String nombre;
@@ -27,6 +30,31 @@ class InterfazPrincipal extends StatelessWidget {
       MaterialPageRoute(builder: (context) => PantallaLogin()),
     );
   }
+
+  Future<void> enviarComandoFoco(String dispositivoId, String accion) async {
+    final url = Uri.parse('http://localhost:5000/api/dispositivo/foco');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'dispositivo_id': int.parse(dispositivoId),
+          'accion': accion,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Comando enviado correctamente: $accion');
+      } else {
+        print('Error al enviar comando: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+      }
+    } catch (e) {
+      print('Error de conexión: $e');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -68,28 +96,34 @@ class InterfazPrincipal extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () => _enviarComando('encender'),
+                  onPressed: () async {
+                    await enviarComandoFoco('1', 'encender');
+                  },
                   child: Text('Encendido'),
                 ),
                 SizedBox(width: 20),
                 ElevatedButton(
-                  onPressed: () => _enviarComando('apagar'),
+                  onPressed: () async {
+                    await enviarComandoFoco('1', 'apagar');
+                  },
                   child: Text('Apagado'),
                 ),
               ],
             ),
             SizedBox(height: 40),
             Divider(),
+
+            /// Íconos: foco1 - cerradura - foco2
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Column(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.ac_unit, size: 30),
-                      onPressed: () => _navegarADispositivo(context, 'ventilador'),
+                      icon: Icon(Icons.lightbulb_outline, size: 30),
+                      onPressed: () => _navegarADispositivo(context, 'foco1'),
                     ),
-                    Text('Ventilador'),
+                    Text('Foco 1'),
                   ],
                 ),
                 Column(
@@ -104,22 +138,24 @@ class InterfazPrincipal extends StatelessWidget {
                 Column(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.lightbulb_outline, size: 30),
-                      onPressed: () => _navegarADispositivo(context, 'luz'),
+                      icon: Icon(Icons.lightbulb, size: 30),
+                      onPressed: () => _navegarADispositivo(context, 'foco2'),
                     ),
-                    Text('Luz'),
+                    Text('Foco 2'),
                   ],
                 ),
-
               ],
             ),
+
             SizedBox(height: 30),
+
+            /// Botón de Soporte Técnico (único con estilo especial)
             Center(
               child: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => PantallaSoporte(idUsuario: idUsuario)), // A crear
+                    MaterialPageRoute(builder: (_) => PantallaSoporte(idUsuario: idUsuario)),
                   );
                 },
                 icon: Icon(Icons.support_agent),
@@ -134,7 +170,6 @@ class InterfazPrincipal extends StatelessWidget {
             ),
           ],
         ),
-
       ),
     );
   }
