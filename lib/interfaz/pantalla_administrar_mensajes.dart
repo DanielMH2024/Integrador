@@ -14,8 +14,7 @@ class _PantallaAdministrarMensajesState extends State<PantallaAdministrarMensaje
   List mensajes = [];
   bool cargando = true;
   String error = '';
-  final String backendUrl = 'http://localhost:5000'; // Cambiar si estás en móvil
-
+  final String backendUrl = 'http://localhost:5000'; //ip de laptop si es movil
   @override
   void initState() {
     super.initState();

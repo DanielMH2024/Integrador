@@ -76,6 +76,7 @@ class InterfazPrincipal extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
+            //simulacion
             Text(
               'Bienvenido, $nombre',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -113,7 +114,7 @@ class InterfazPrincipal extends StatelessWidget {
             SizedBox(height: 40),
             Divider(),
 
-            /// Íconos: foco1 - cerradura - foco2
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -149,7 +150,7 @@ class InterfazPrincipal extends StatelessWidget {
 
             SizedBox(height: 30),
 
-            /// Botón de Soporte Técnico (único con estilo especial)
+
             Center(
               child: ElevatedButton.icon(
                 onPressed: () {

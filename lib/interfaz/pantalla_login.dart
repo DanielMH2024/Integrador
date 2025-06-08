@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'pantalla_principal.dart'; // Asegúrate de tener el archivo y cambiar el path si es necesario
-import 'pantalla_admin.dart'; //
+import 'pantalla_principal.dart';
+import 'pantalla_admin.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;

@@ -29,7 +29,7 @@ class _InterfazAdminState extends State<InterfazAdmin> {
   bool cargando = false;
   String errorCarga = '';
 
-  List<dynamic> mensajesAtencion = []; // Declarar esta lista aquí
+  List<dynamic> mensajesAtencion = [];
   bool cargandoMensajes = false;
   String errorMensajes = '';
 
@@ -54,7 +54,7 @@ class _InterfazAdminState extends State<InterfazAdmin> {
     _cargarMensajes();
   }
 
-  //nuevo a gregado
+  //metodo cargar
   void _cargarMensajes() async {
     setState(() {
       cargandoMensajes = true;
@@ -63,7 +63,7 @@ class _InterfazAdminState extends State<InterfazAdmin> {
 
     try {
       final mensajes = await fetchMensajesProblemas();
-      print('Mensajes recibidos: $mensajes'); // <- Aquí
+      print('Mensajes recibidos: $mensajes');
       setState(() {
         mensajesAtencion = List.from(mensajes);
         mensajesAtencion.sort((a, b) =>
@@ -243,7 +243,7 @@ class _InterfazAdminState extends State<InterfazAdmin> {
             Container(
               height: 200,
               color: Colors.grey[200],
-              child: Center(child: Text('')), // Aquí deberías poner el historial
+              child: Center(child: Text('')),
             ),
             Divider(height: 40),
             Text('Habitaciones y Usuarios Asignados',
@@ -383,7 +383,7 @@ Future<Map<String, dynamic>> crearUsuario(Map<String, String> datos) async {
     } else {
       return {
         "exito": false,
-        "mensaje": body["error"] ?? "Error desconocido"
+        "mensaje": body["error"] ?? "Error"
       };
     }
   } catch (e) {
@@ -413,7 +413,7 @@ Future<List<dynamic>> fetchHabitacionesUsuarios() async {
 
 // Función para traer mensajes de problemas o atención
 Future<List<dynamic>> fetchMensajesProblemas() async {
-  final url = Uri.parse('http://localhost:5000/soporte'); // Cambia por tu endpoint real
+  final url = Uri.parse('http://localhost:5000/soporte'); // Cambia por tu ip real
 
   try {
     final response = await http.get(url);
