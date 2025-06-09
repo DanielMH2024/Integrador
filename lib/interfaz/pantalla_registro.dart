@@ -22,7 +22,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
 
   //este metodo es para enviar los datos al backen
   Future<bool> enviarRegistro(Map<String, String> datosRegistro) async {
-    final url = Uri.parse('http://localhost:5000/registro'); // Asegúrate que es la IP de tu PC
+    final url = Uri.parse('http://localhost:5000/registro');
   //http://192.168.18.42:5000/registro
     try {
       final response = await http.post(
