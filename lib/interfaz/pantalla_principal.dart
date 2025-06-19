@@ -4,6 +4,7 @@ import 'pantalla_login.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class InterfazPrincipal extends StatefulWidget {
   final int idUsuario;
@@ -18,10 +19,22 @@ class InterfazPrincipal extends StatefulWidget {
 
   @override
   _InterfazPrincipalState createState() => _InterfazPrincipalState();
+
+
 }
 
 class _InterfazPrincipalState extends State<InterfazPrincipal> {
   String dispositivoActivo = ''; // 'foco1', 'cerradura', 'foco2'
+  late stt.SpeechToText _speech;
+  bool _isListening = false;
+  String _textoReconocido = '';
+
+  @override
+  void initState(){
+    super.initState();
+    _speech = stt.SpeechToText();
+  }
+
 
   void _cerrarSesion(BuildContext context) {
     Navigator.pushReplacement(
@@ -29,6 +42,50 @@ class _InterfazPrincipalState extends State<InterfazPrincipal> {
       MaterialPageRoute(builder: (context) => PantallaLogin()),
     );
   }
+
+  void _iniciarEscucha() async {
+    if (!_isListening) {
+      bool disponible = await _speech.initialize(
+        onStatus: (estado) => print('Estado: $estado'),
+        onError: (error) => print('Error: $error'),
+      );
+
+      if (disponible) {
+        setState(() => _isListening = true);
+        _speech.listen(
+          onResult: (resultado) {
+            setState(() {
+              _textoReconocido = resultado.recognizedWords.toLowerCase();
+            });
+
+            print('Reconocido: $_textoReconocido');
+
+            // Acciones según la frase
+            if (_textoReconocido.contains('encender foco uno')) {
+              enviarComandoFoco('1', 'encender');
+            } else if (_textoReconocido.contains('apagar foco uno')) {
+              enviarComandoFoco('1', 'apagar');
+            } else if (_textoReconocido.contains('encender foco dos')) {
+              enviarComandoFoco('3', 'encender');
+            } else if (_textoReconocido.contains('apagar foco dos')) {
+              enviarComandoFoco('3', 'apagar');
+            } else if (_textoReconocido.contains('abrir cerradura')) {
+              enviarComandoCerradura('2', 'abrir');
+            } else if (_textoReconocido.contains('cerrar cerradura')) {
+              enviarComandoCerradura('2', 'cerrar');
+            }
+          },
+        );
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech.stop();
+    }
+  }
+
+
+
+
 
   Future<void> enviarComandoFoco(String dispositivoId, String accion) async {
     final url = Uri.parse('http://localhost:5000/api/dispositivo/foco');
@@ -109,10 +166,15 @@ class _InterfazPrincipalState extends State<InterfazPrincipal> {
               SizedBox(height: 20),
               Center(
                 child: IconButton(
-                  icon: Icon(Icons.mic, size: 40),
-                  onPressed: () {
-                    print('Simulación de control por voz');
-                  },
+                  icon: Icon(_isListening ? Icons.mic : Icons.mic_none, size: 40, color: Colors.redAccent),
+                  onPressed: _iniciarEscucha,
+                ),
+              ),
+              SizedBox(height: 10),
+              Center(
+                child: Text(
+                  _textoReconocido,
+                  style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
                 ),
               ),
 
